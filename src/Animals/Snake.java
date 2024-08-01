@@ -6,9 +6,9 @@
  */
 package Animals;
 
-import Animals.Base.Animal;
 import Animals.Base.IReptile;
 import Animals.Base.TerrestrialAnimals;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.ArrayList;
  */
 public class Snake extends TerrestrialAnimals implements IReptile {
     /** Enum representing how venomous the snake is. */
-    public enum poisonous {
+    public enum Poisonous {
         Low, Medium, High
     }
-    private final poisonous poisonous;
+    private final Poisonous poisonous;
     /**
      * Constructs a new Snake instance.
      *
@@ -32,9 +32,11 @@ public class Snake extends TerrestrialAnimals implements IReptile {
      * @param medals    A list of medals that the snake has won.
      * @param poisonous Whether the snake is poisonous or not.
      */
-    public Snake(String name, Animal.gender gender, double weight, ArrayList<Medal> medals, poisonous poisonous){
-        super(name, gender, weight, 0, medals, 0);
+    public Snake(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                 ArrayList<Medal> medals, CompetitionFrame myFrame, Poisonous poisonous){
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, 0, myFrame);
         this.poisonous = poisonous;
+        loadImages("snake");
     }
     /**
      * Produces the sound made by the snake.
@@ -51,7 +53,7 @@ public class Snake extends TerrestrialAnimals implements IReptile {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Is poisonous: " + poisonous + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Is poisonous: " + poisonous + "\n";
     }
     /**
      * Compares this Snake to another object for equality.

@@ -7,7 +7,7 @@
 package Animals;
 
 import Animals.Base.AirAnimal;
-import Animals.Base.Animal;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
@@ -28,9 +28,11 @@ public class Pigeon extends AirAnimal {
      * @param wingspan The wingspan of the pigeon.
      * @param family   The family type of the pigeon.
      */
-    public Pigeon(String name, Animal.gender gender, double weight, ArrayList<Medal> medals, double wingspan, String family) {
-        super(name, gender, weight, 0, medals, wingspan);
+    public Pigeon(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                  ArrayList<Medal> medals, double wingspan, CompetitionFrame myFrame, String family) {
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, myFrame, wingspan);
         this.family = family;
+        loadImages("pigeon");
     }
     /**
      * Produces the sound made by the pigeon.
@@ -47,7 +49,7 @@ public class Pigeon extends AirAnimal {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Family: " + family + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Family: " + family + "\n";
     }
     /**
      * Compares this Pigeon to another object for equality.

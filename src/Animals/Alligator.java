@@ -7,7 +7,8 @@
 package Animals;
 import Animals.Base.IReptile;
 import Animals.Base.TerrestrialAnimals;
-import Animals.Base.WaterAnimal;
+import Animals.Base.AquaticAnimal;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
@@ -17,10 +18,9 @@ import java.util.Objects;
  * The Alligator class represents a specific type of water animal, implementing characteristics of a reptile.
  * It extends the WaterAnimal class and implements the IReptile interface.
  */
-public class Alligator extends WaterAnimal implements IReptile {
-    private TerrestrialAnimals terrestrialSide;
+public class Alligator extends AquaticAnimal implements IReptile {
+    public TerrestrialAnimals terrestrialSide;
     private String areaOfLiving;
-
     /**
      * Constructs a new Alligator instance.
      *
@@ -30,10 +30,12 @@ public class Alligator extends WaterAnimal implements IReptile {
      * @param medals       A list of medals that the alligator has won.
      * @param areaOfLiving The area where the alligator lives.
      */
-    public Alligator(String name, gender gender, double weight, ArrayList<Medal> medals, String areaOfLiving) {
-        super(name, gender, weight, medals, 0);
-        this.terrestrialSide = new TerrestrialAnimals(name, gender, weight, 0, medals, 4);
+    public Alligator(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                     ArrayList<Medal> medals, CompetitionFrame myFrame, String areaOfLiving) {
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, myFrame);
+        this.terrestrialSide = new TerrestrialAnimals(name, gender, competition, weight, 0, maxEnergy, energyPerMeter ,medals, 4, myFrame);
         this.areaOfLiving = areaOfLiving;
+        loadImages("alligator");
     }
     /**
      * Produces the sound made by the alligator.
@@ -49,8 +51,12 @@ public class Alligator extends WaterAnimal implements IReptile {
      * @return A string representation of the Alligator instance.
      */
     @Override
+    public void speedUp(int speed) {
+        setSpeed(Math.min(MAX_SPEED, getSpeed() + speed));
+    }
+    @Override
     public String toString() {
-        return  super.toString() + ", Area of Living: " + areaOfLiving + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Area of Living: " + areaOfLiving + "\n";
     }
     /**
      * Compares this Alligator to another object for equality.
@@ -70,8 +76,4 @@ public class Alligator extends WaterAnimal implements IReptile {
      *
      * @param speed The amount by which to increase the speed.
      */
-    @Override
-    public void speedUp(int speed) {
-        setSpeed(Math.min(MAX_SPEED, getSpeed() + speed));
-    }
 }

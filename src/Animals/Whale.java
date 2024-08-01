@@ -6,16 +6,17 @@
  */
 package Animals;
 
-import Animals.Base.WaterAnimal;
+import Animals.Base.AquaticAnimal;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
-
 import java.util.ArrayList;
 import java.util.Objects;
+
 /**
  * The Whale class represents a specific type of water animal.
  * It extends the WaterAnimal class, adding attributes specific to a whale.
  */
-public class Whale extends WaterAnimal {
+public class Whale extends AquaticAnimal {
     /** The type of food that the whale consumes */
     private String foodType;
     /**
@@ -27,9 +28,11 @@ public class Whale extends WaterAnimal {
      * @param medals    A list of medals that the whale has won.
      * @param foodType  The type of food that the whale consumes.
      */
-    public Whale(String name, gender gender, double weight, ArrayList<Medal> medals, String foodType) {
-        super(name, gender, weight, medals, 0);
+    public Whale(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                 ArrayList<Medal> medals, CompetitionFrame myFrame, String foodType) {
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, myFrame);
         this.foodType = foodType;
+        loadImages("whale");
     }
     /**
      * Produces the sound made by the whale.
@@ -46,7 +49,7 @@ public class Whale extends WaterAnimal {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Food type: " + foodType + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Food type: " + foodType + "\n";
     }
     /**
      * Compares this Whale to another object for equality.

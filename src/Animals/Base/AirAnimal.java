@@ -5,10 +5,12 @@
  * Class AirAnimal
  */
 package Animals.Base;
+import Graphics.CompetitionFrame;
 import Mobility.Point;
 import Olympics.Medal;
 
 import java.util.ArrayList;
+
 
 /**
  * The AirAnimal class represents animals that are capable of flying.
@@ -16,8 +18,6 @@ import java.util.ArrayList;
  */
 public class AirAnimal extends Animal {
     private double wingspan;
-
-
     /**
      * Constructs a new AirAnimal instance.
      *
@@ -28,8 +28,9 @@ public class AirAnimal extends Animal {
      * @param medals   A list of medals that the animal has won.
      * @param wingspan The wingspan of the animal.
      */
-    public AirAnimal(String name, gender gender, double weight, double speed, ArrayList<Medal> medals, double wingspan) {
-        super(name, gender, weight, speed, medals, new Point(0,100));
+    public AirAnimal(String name, Gender gender, Competition competition, double weight, int speed, int maxEnergy, int energyPerMeter,
+                     ArrayList<Medal> medals, CompetitionFrame myFrame, double wingspan) {
+        super(name, gender, competition, weight, speed, maxEnergy, energyPerMeter, medals, myFrame);
         this.wingspan = wingspan;
     }
     /**

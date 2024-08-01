@@ -6,23 +6,24 @@
  */
 package Animals;
 
-import Animals.Base.WaterAnimal;
+import Animals.Base.AquaticAnimal;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
+
 /**
  * The Dolphin class represents a specific type of water animal.
  * It extends the WaterAnimal class and adds attributes specific to a dolphin.
  */
-public class Dolphin extends WaterAnimal {
+public class Dolphin extends AquaticAnimal {
     /**
      * Enum representing the types of water in which dolphins can live.
      */
-    public enum waterType {
+    public enum WaterType {
         Sea, Sweet
     }
-
-    private waterType waterType;
+    private WaterType waterType;
     /**
      * Constructs a new Dolphin instance.
      *
@@ -32,9 +33,11 @@ public class Dolphin extends WaterAnimal {
      * @param medals         A list of medals that the dolphin has won.
      * @param waterType      The type of water in which the dolphin lives (Sea or Sweet).
      */
-    public Dolphin(String name, gender gender, double weight, ArrayList<Medal> medals, waterType waterType) {
-        super(name, gender, weight, medals, 0);
+    public Dolphin(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                   ArrayList<Medal> medals, CompetitionFrame myFrame, WaterType waterType) {
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, myFrame);
         this.waterType = waterType;
+        loadImages("dolphin");
     }
     /**
      * Produces the sound made by the dolphin.
@@ -51,7 +54,7 @@ public class Dolphin extends WaterAnimal {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Living water type: " + waterType + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Living water type: " + waterType + "\n";
     }
     /**
      * Compares this Dolphin to another object for equality.

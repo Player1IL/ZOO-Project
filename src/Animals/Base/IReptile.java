@@ -7,6 +7,6 @@
 package Animals.Base;
 
 public interface IReptile {
-    static final double MAX_SPEED = 5;
+    static final int MAX_SPEED = 5;
     void speedUp (int speed);
 }

@@ -5,12 +5,13 @@
  * Class Point
  */
 package Mobility;
-/**
+
+import Graphics.IClonable; /**
  * The Point class represents a point in a 2-dimensional space with coordinates (x, y).
  * It provides methods to calculate distance between points, and overrides toString and equals methods.
  */
-public class Point {
-    private int x, y;
+public class Point implements IClonable {
+        private int x, y;
     /**
      * Constructs a Point object with specified x and y coordinates.
      *
@@ -29,6 +30,12 @@ public class Point {
      */
     public double distanceP2P(Point p) {
         return Math.sqrt(Math.pow(this.x - p.x, 2) + Math.pow(this.y - p.y, 2));
+    }
+    public int getX() {return this.x;}
+    public int getY() {return this.y;}
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
     /**
      * Returns a string representation of the point in the format "(x, y)".

@@ -7,6 +7,7 @@
 package Animals;
 
 import Animals.Base.AirAnimal;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
@@ -27,9 +28,11 @@ public class Eagle extends AirAnimal {
      * @param wingspan        The wingspan of the eagle.
      * @param altitudeOfFlight The altitude at which the eagle flies.
      */
-    public Eagle(String name, gender gender, double weight, ArrayList<Medal> medals, double wingspan, double altitudeOfFlight) {
-        super(name, gender, weight, 0, medals, wingspan);
+    public Eagle(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+                 ArrayList<Medal> medals, double wingspan, CompetitionFrame myFrame, double altitudeOfFlight) {
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, myFrame, wingspan);
         this.altitudeOfFlight = limitAltitude(altitudeOfFlight);
+        loadImages("eagle");
     }
     /**
      * Limits the altitude of flight to the maximum allowed altitude.
@@ -55,7 +58,7 @@ public class Eagle extends AirAnimal {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Altitude: " + altitudeOfFlight + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Altitude: " + altitudeOfFlight + "\n";
     }
     /**
      * Compares this Eagle to another object for equality.

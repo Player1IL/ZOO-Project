@@ -5,6 +5,7 @@
  * Class Terrestrial lAnimals
  */
 package Animals.Base;
+import Graphics.CompetitionFrame;
 import Mobility.Point;
 import Olympics.Medal;
 
@@ -16,7 +17,6 @@ import java.util.ArrayList;
  */
 public class TerrestrialAnimals extends Animal {
     private final int noLegs;
-
     /**
      * Constructs a new TerrestrialAnimals instance.
      *
@@ -27,8 +27,9 @@ public class TerrestrialAnimals extends Animal {
      * @param medals   A list of medals that the animal has won.
      * @param noLegs   The number of legs the animal has.
      */
-    public TerrestrialAnimals(String name, gender gender, double weight, double speed, ArrayList<Medal> medals, int noLegs) {
-        super(name, gender, weight, speed, medals, new Point(0,20));
+    public TerrestrialAnimals(String name, Gender gender, Competition competition, double weight, int speed, int maxEnergy, int energyPerMeter,
+                              ArrayList<Medal> medals, int noLegs, CompetitionFrame myFrame) {
+        super(name, gender, competition, weight, speed, maxEnergy, energyPerMeter, medals, myFrame);
         this.noLegs = noLegs;
     }
     /**

@@ -5,6 +5,7 @@
  * Class Water Animals
  */
 package Animals.Base;
+import Graphics.CompetitionFrame;
 import Mobility.Point;
 import Olympics.Medal;
 
@@ -14,10 +15,9 @@ import java.util.ArrayList;
  * The WaterAnimal class represents animals that live primarily in water.
  * It extends the Animal class and adds attributes related to diving.
  */
-public class WaterAnimal extends Animal {
+public class AquaticAnimal extends Animal {
     private static final double MAX_DIVE = -800;
     private double diveDepth = 0;
-
     /**
      * Constructs a new WaterAnimal instance.
      *
@@ -27,8 +27,9 @@ public class WaterAnimal extends Animal {
      * @param medals   A list of medals that the animal has won.
      * @param speed    The speed of the animal.
      */
-    public WaterAnimal(String name, gender gender, double weight, ArrayList<Medal> medals, double speed) {
-        super(name, gender, weight, speed, medals, new Point(50,0));
+    public AquaticAnimal(String name, Gender gender, Competition competition, double weight, int speed, int maxEnergy,
+                         int energyPerMeter, ArrayList<Medal> medals, CompetitionFrame myFrame) {
+        super(name, gender, competition, weight, speed, maxEnergy, energyPerMeter, medals, myFrame);
     }
     /**
      * Causes the animal to dive to a specified depth. The depth is limited by a maximum dive depth.
@@ -56,8 +57,8 @@ public class WaterAnimal extends Animal {
     @Override
     public boolean equals(Object waterAnimal) {
         if (this == waterAnimal) return true;
-        if (!(waterAnimal instanceof WaterAnimal newWaterAnimal)) return false;
+        if (!(waterAnimal instanceof AquaticAnimal newAquaticAnimal)) return false;
         if (!super.equals(waterAnimal)) return false;
-        return Double.compare(diveDepth, newWaterAnimal.diveDepth) == 0;
+        return Double.compare(diveDepth, newAquaticAnimal.diveDepth) == 0;
     }
 }

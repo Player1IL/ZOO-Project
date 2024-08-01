@@ -6,6 +6,7 @@
  */
 package Animals;
 import Animals.Base.TerrestrialAnimals;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
 
 import java.util.ArrayList;
@@ -26,9 +27,11 @@ public class Dog extends TerrestrialAnimals {
      * @param medals   A list of medals that the dog has won.
      * @param breed    The breed type of the dog.
      */
-    public Dog(String name, gender gender, double weight, ArrayList<Medal> medals, String breed){
-        super(name, gender, weight, 0, medals, 4);
+    public Dog(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+               ArrayList<Medal> medals, CompetitionFrame myFrame, String breed){
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, 4, myFrame);
         this.breed = breed;
+        loadImages("dog");
     }
     /**
      * Produces the sound made by the dog.
@@ -45,7 +48,7 @@ public class Dog extends TerrestrialAnimals {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Breed type: " + breed + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Breed type: " + breed + "\n";
     }
     /**
      * Compares this Dog to another object for equality.

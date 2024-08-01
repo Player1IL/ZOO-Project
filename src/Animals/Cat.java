@@ -6,10 +6,9 @@
  */
 package Animals;
 
-import Animals.Base.Animal;
 import Animals.Base.TerrestrialAnimals;
+import Graphics.CompetitionFrame;
 import Olympics.Medal;
-
 import java.util.ArrayList;
 
 /**
@@ -18,7 +17,6 @@ import java.util.ArrayList;
  */
 public class Cat extends TerrestrialAnimals {
     private boolean castrated;
-
     /**
      * Constructs a new Cat instance.
      *
@@ -28,9 +26,11 @@ public class Cat extends TerrestrialAnimals {
      * @param medals     A list of medals that the cat has won.
      * @param castrated  Whether the cat is castrated or not.
      */
-    public Cat(String name, Animal.gender gender, double weight, ArrayList<Medal> medals, boolean castrated){
-        super(name, gender, weight, 0, medals, 4);
+    public Cat(String name, Gender gender, Competition competition, double weight, int maxEnergy, int energyPerMeter,
+               ArrayList<Medal> medals, CompetitionFrame myFrame, boolean castrated){
+        super(name, gender, competition, weight, 0, maxEnergy, energyPerMeter, medals, 4, myFrame);
         this.castrated = castrated;
+        loadImages("cat");
     }
     /**
      * Produces the sound made by the cat.
@@ -47,7 +47,7 @@ public class Cat extends TerrestrialAnimals {
      */
     @Override
     public String toString() {
-        return  super.toString() + ", Is castrated: " + castrated + "\n";
+        return this.getClass().getSimpleName() + "- " + super.toString() + ", Is castrated: " + castrated + "\n";
     }
     /**
      * Compares this Cat to another object for equality.
