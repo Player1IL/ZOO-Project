@@ -6,6 +6,7 @@
  */
 package Animals.Base;
 
+import Animals.Thread.AnimalThread;
 import Graphics.*;
 import Mobility.Mobile;
 import Olympics.Medal;
@@ -69,6 +70,10 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
     private final Competition competition;
     private Point[] field;
 
+    private AnimalThread hold;
+
+    private final Object lock = new Object();
+
     /**
      * Constructs a new Animal instance with the specified attributes.
      *
@@ -115,18 +120,22 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
      * @return true if the energy was successfully added, false otherwise.
      */
     public boolean eat(int energy) {
+        synchronized (lock) {
         if (energy >= 0) {
             if (maxEnergy >= currentEnergy + energy) {
                 currentEnergy = currentEnergy + energy;
+                lock.notifyAll();
                 return true;
             } else if (maxEnergy < currentEnergy + energy) {
                 currentEnergy = maxEnergy;
+                lock.notifyAll();
                 return true;
             }
         }
         return false;
+        }
     }
-
+    public Object getLock() {return lock;}
     @Override
     public String getAnimaleName() {
         return this.name;
@@ -219,6 +228,9 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
     public int getUID() {
         return id;
     }
+
+    public void setAnimalThread(AnimalThread hold) {this.hold = hold;}
+    public AnimalThread getAnimalThread() {return hold;}
     /**
      * Sets the location of the animal based on the specified competition type.
      *
@@ -361,9 +373,9 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
      * Updates the animal's location and orientation as it moves through the competition field.
      *
      * @return true if the race was successfully executed; false otherwise.
-     * @throws CloneNotSupportedException if cloning is not supported.
      */
-    public boolean race() throws CloneNotSupportedException {
+    public boolean race() {
+        boolean raceAgain = true;
         try {
             speed = currentEnergy / energyPerMeter;
         } catch (ArithmeticException e) {
@@ -408,7 +420,8 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
                     }
                     else {
                         move(new Point(field[0].getX(), field[0].getY()));
-                        orientation = Orientation.East;
+                        // orientation = Orientation.East; // Don't repeat
+                        raceAgain = false;
                     }
                     currentEnergy = currentEnergy - getLocation().getX();
                 }
@@ -422,7 +435,8 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
                     } catch (CloneNotSupportedException e) {
                         return false;
                     }
-                    orientation = Orientation.East;
+                    // orientation = Orientation.East; // Don't repeat
+                    raceAgain = false;
                     currentEnergy = currentEnergy - getLocation().getY();
                 }
             }
@@ -433,13 +447,34 @@ abstract public class Animal extends Mobile implements IMoveable, IDrawable, ICl
                 return false;
             }
             myFrame.repaint();
-            if (speed > 0) {
+            if (speed > 0 && raceAgain) {
                 race();
             }
             return true;
         }
         return false;
     }
+    public boolean finishedRace() {
+        if (Competition.Circle == competition) {
+            if (Orientation.North == orientation) {
+                return getLocation().getX() == field[0].getX() && getLocation().getY() == field[0].getY();
+            }
+        }
+        else if (competition == Competition.Air1 || competition == Competition.Air2 || competition == Competition.Air3 ||
+                competition == Competition.Air4 || competition == Competition.Air5) {
+            if (Orientation.West == orientation) {
+                return getLocation().getX() == field[0].getX();
+            }
+        }
+        else if (competition == Competition.Pool1 || competition == Competition.Pool2 ||
+                competition == Competition.Pool3 || competition == Competition.Pool4) {
+            if (Orientation.West == orientation) {
+                return getLocation().getX() == field[0].getX();
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns a string representation of the Animal instance, including its name, gender, weight, speed, medals, and position.
      *

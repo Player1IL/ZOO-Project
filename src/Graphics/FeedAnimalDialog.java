@@ -78,7 +78,6 @@ public class FeedAnimalDialog extends JDialog {
      * Displays an error message if the input is invalid or insufficient energy is provided.
      *
      * @throws NumberFormatException if the energy input is not a valid integer
-     * @throws CloneNotSupportedException if the clone operation on the animal fails
      */
     private void feedAnimal() {
         Animal selectedAnimal = (Animal) animalDropdown.getSelectedItem();
@@ -87,15 +86,16 @@ public class FeedAnimalDialog extends JDialog {
             int energy = Integer.parseInt(energyText);
             if (selectedAnimal != null) {
                 boolean result = selectedAnimal.eat(energy);
+
                 if (!result) {
                     JOptionPane.showMessageDialog(this, "Invalid input or insufficient energy.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, "Animal was fed, current energy: " + selectedAnimal.getEnergyAmount(), "Info", JOptionPane.INFORMATION_MESSAGE);
                     // Here temporarily
-                    selectedAnimal.race();
+                    // selectedAnimal.race();
                 }
             }
-        } catch (NumberFormatException | CloneNotSupportedException ex) {
+        } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

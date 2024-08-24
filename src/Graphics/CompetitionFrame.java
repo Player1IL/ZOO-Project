@@ -11,6 +11,8 @@ import Animals.Base.AirAnimal;
 import Animals.Base.Animal;
 import Animals.Base.AquaticAnimal;
 import Animals.Base.TerrestrialAnimals;
+import Array.EnhancedLimitedArray;
+import Tournaments.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,12 +20,17 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map;
 
 import static System.Sys.animalArrayList;
+import static System.Sys.tournamentArrayList;
 
 /**
  * Represents the main frame of the competition application.
@@ -32,12 +39,19 @@ import static System.Sys.animalArrayList;
 public class CompetitionFrame extends JFrame {
 
     private static boolean infoTableStatus = false;
+    private static boolean infoTournamentTableStatus = false;
 
-    private Object[][] data;
-    private int dataArraySize;
+    private Object[][] dataAnimal;
+    private Object[][] dataTournament;
+
+    private int dataAnimalArraySize;
+    private int dataTournamentArraySize;
+
     private int deleted = 0;
     private BufferedImage backgroundImage;
     private ArrayList<String> activeCompetitions = new ArrayList<>();
+    private ArrayList<String> activeTournaments = new ArrayList<>();
+    private ArrayList<Tournament> allTournaments = new ArrayList<>();
 
     /**
      * Constructs a new CompetitionFrame.
@@ -105,7 +119,7 @@ public class CompetitionFrame extends JFrame {
 
         // Create panel for buttons
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(1, 6));
+        buttonPanel.setLayout(new GridLayout(1, 8));
 
         // Add buttons to the panel
         JButton addCompetitionButton = new JButton("Add Competition");
@@ -149,34 +163,62 @@ public class CompetitionFrame extends JFrame {
                 System.exit(0);
             }
         });
-        JButton infoButton = new JButton("Info");
-        infoButton.addActionListener(new ActionListener() {
+        JButton animalInfoButton = new JButton("Animal Info");
+        animalInfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int columns = 8; // 7
 
-                if (data == null) {
-                    dataArraySize = animalArrayList.size();
-                    data = new Object[dataArraySize][columns];
+                if (dataAnimal == null) {
+                    dataAnimalArraySize = animalArrayList.size();
+                    dataAnimal = new Object[dataAnimalArraySize][columns];
 
-                    createInfoArrayFirstTime();
-                    openInfoTable(data);
+                    createAnimalInfoArrayFirstTime();
+                    openInfoTable(dataAnimal);
                 } else {
-                    if (dataArraySize == animalArrayList.size() + deleted)
-                        openInfoTable(data);
+                    if (dataAnimalArraySize == animalArrayList.size() + deleted)
+                        openInfoTable(dataAnimal);
                     else {
-                        data = increaseInfoTableArray(dataArraySize, animalArrayList.size() + deleted, columns);
+                        dataAnimal = increaseInfoTableArray(dataAnimalArraySize, animalArrayList.size() + deleted, columns);
                         updateInfoTableArray();
-                        openInfoTable(data);
+                        openInfoTable(dataAnimal);
                     }
                 }
+            }
+        });
+        JButton startTournamentButton = new JButton("Start Tournament");
+        startTournamentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // StartTournamentDialog dialog = new StartTournamentDialog(CompetitionFrame.this, activeTournaments, allTournaments);
+                // dialog.setVisible(true);
+                new Thread(() -> {
+                    StartTournamentDialog dialog = new StartTournamentDialog(CompetitionFrame.this, activeTournaments, allTournaments);
+                    dialog.setVisible(true);
+                }).start();
+            }
+        });
+        JButton tournamentInfoButton = new JButton("Tournament Info");
+        tournamentInfoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int columns = 5; // 4
+
+                dataTournamentArraySize = getJTableTournamentInfoSize();
+                dataTournament = new Object[dataTournamentArraySize][columns];
+
+                createTournamentInfoArrayFirstTime();
+                openTournamentInfo(dataTournament);
+
             }
         });
         buttonPanel.add(addCompetitionButton);
         buttonPanel.add(addAnimalButton);
         buttonPanel.add(addClearButton);
         buttonPanel.add(addEatButton);
-        buttonPanel.add(infoButton);
+        buttonPanel.add(startTournamentButton);
+        buttonPanel.add(tournamentInfoButton);
+        buttonPanel.add(animalInfoButton);
         buttonPanel.add(exitButton);
 
         // Add button panel to the frame
@@ -229,9 +271,9 @@ public class CompetitionFrame extends JFrame {
             tableFrame.setVisible(true);
 
             tableFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            tableFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            tableFrame.addWindowListener(new WindowAdapter() {
                 @Override
-                public void windowClosed(java.awt.event.WindowEvent e) {
+                public void windowClosed(WindowEvent e) {
                     infoTableStatus = false;
                 }
             });
@@ -242,10 +284,10 @@ public class CompetitionFrame extends JFrame {
      * Creates the initial array of data for the information table.
      * Populates the table with information from the current list of animals.
      */
-    public void createInfoArrayFirstTime() {
+    public void createAnimalInfoArrayFirstTime() {
         for (int i = 0; i < animalArrayList.size(); ++i) {
             Animal animal = animalArrayList.get(i);
-            updateInfoTableRow(animal, i);
+            updateAnimalInfoTableRow(animal, i);
         }
     }
 
@@ -260,9 +302,9 @@ public class CompetitionFrame extends JFrame {
     public Object[][] increaseInfoTableArray(int oldSizeRows, int newSizeRows, int columns) {
         Object[][] newData = new Object[newSizeRows][columns];
         for (int i = 0; i < oldSizeRows; ++i) {
-            System.arraycopy(data[i], 0, newData[i], 0, data[i].length);
+            System.arraycopy(dataAnimal[i], 0, newData[i], 0, dataAnimal[i].length);
         }
-        dataArraySize = newSizeRows;
+        dataAnimalArraySize = newSizeRows;
         return newData;
     }
 
@@ -274,16 +316,16 @@ public class CompetitionFrame extends JFrame {
         for (Animal animal : animalArrayList) {
             boolean isOld = false;
 
-            for (int j = 0; j < dataArraySize; ++j) {
-                Object value = data[j][7];
+            for (int j = 0; j < dataAnimalArraySize; ++j) {
+                Object value = dataAnimal[j][7];
                 if (value != null) {
                     if (value instanceof Integer uid) {
                         if (uid == animal.getUID()) {
-                            data[j][3] = animal.getSpeed();
-                            data[j][4] = animal.getEnergyAmount();
-                            data[j][5] = animal.getDistance();
-                            data[j][6] = animal.getConsumedEnergy();
-                            data[j][7] = animal.getUID();
+                            dataAnimal[j][3] = animal.getSpeed();
+                            dataAnimal[j][4] = animal.getEnergyAmount();
+                            dataAnimal[j][5] = animal.getDistance();
+                            dataAnimal[j][6] = animal.getConsumedEnergy();
+                            dataAnimal[j][7] = animal.getUID();
                             isOld = true;
                             break;
                         }
@@ -291,10 +333,10 @@ public class CompetitionFrame extends JFrame {
                 }
             }
             if (!isOld) {
-                for (int k = 0; k < dataArraySize; ++k) {
-                    Object value = data[k][7];
+                for (int k = 0; k < dataAnimalArraySize; ++k) {
+                    Object value = dataAnimal[k][7];
                     if (value == null) {
-                        updateInfoTableRow(animal, k);
+                        updateAnimalInfoTableRow(animal, k);
                     }
                 }
             }
@@ -307,48 +349,48 @@ public class CompetitionFrame extends JFrame {
      * @param animal the animal whose data is to be updated
      * @param i      the row index in the table
      */
-    public void updateInfoTableRow(Animal animal, int i) {
-        data[i][0] = animal.getAnimaleName();
+    public void updateAnimalInfoTableRow(Animal animal, int i) {
+        dataAnimal[i][0] = animal.getAnimaleName();
         switch (animal) {
             case TerrestrialAnimals terrestrialAnimal -> {
-                data[i][1] = terrestrialAnimal.getClass().getSuperclass().getSimpleName();
+                dataAnimal[i][1] = terrestrialAnimal.getClass().getSuperclass().getSimpleName();
                 switch (terrestrialAnimal) {
-                    case Cat cat -> data[i][2] = cat.getClass().getSimpleName();
-                    case Dog dog -> data[i][2] = dog.getClass().getSimpleName();
-                    case Snake snake -> data[i][2] = snake.getClass().getSimpleName();
+                    case Cat cat -> dataAnimal[i][2] = cat.getClass().getSimpleName();
+                    case Dog dog -> dataAnimal[i][2] = dog.getClass().getSimpleName();
+                    case Snake snake -> dataAnimal[i][2] = snake.getClass().getSimpleName();
                     default -> {
                     }
                 }
             }
             case AquaticAnimal aquaticAnimal -> {
                 if (aquaticAnimal instanceof Alligator alligator) {
-                    data[i][1] = aquaticAnimal.getClass().getSuperclass().getSimpleName() + " & " + alligator.terrestrialSide.getClass().getSimpleName();
-                    data[i][2] = alligator.getClass().getSimpleName();
+                    dataAnimal[i][1] = aquaticAnimal.getClass().getSuperclass().getSimpleName() + " & " + alligator.terrestrialSide.getClass().getSimpleName();
+                    dataAnimal[i][2] = alligator.getClass().getSimpleName();
                 } else {
-                    data[i][1] = aquaticAnimal.getClass().getSuperclass().getSimpleName();
+                    dataAnimal[i][1] = aquaticAnimal.getClass().getSuperclass().getSimpleName();
                     if (aquaticAnimal instanceof Dolphin dolphin) {
-                        data[i][2] = dolphin.getClass().getSimpleName();
+                        dataAnimal[i][2] = dolphin.getClass().getSimpleName();
                     } else if (aquaticAnimal instanceof Whale whale) {
-                        data[i][2] = whale.getClass().getSimpleName();
+                        dataAnimal[i][2] = whale.getClass().getSimpleName();
                     }
                 }
             }
             case AirAnimal airAnimal -> {
-                data[i][1] = airAnimal.getClass().getSimpleName();
+                dataAnimal[i][1] = airAnimal.getClass().getSimpleName();
                 if (airAnimal instanceof Eagle eagle) {
-                    data[i][2] = eagle.getClass().getSimpleName();
+                    dataAnimal[i][2] = eagle.getClass().getSimpleName();
                 } else if (airAnimal instanceof Pigeon pigeon) {
-                    data[i][2] = pigeon.getClass().getSimpleName();
+                    dataAnimal[i][2] = pigeon.getClass().getSimpleName();
                 }
             }
             default -> {
             }
         }
-        data[i][3] = animal.getSpeed();
-        data[i][4] = animal.getEnergyAmount();
-        data[i][5] = animal.getDistance();
-        data[i][6] = animal.getConsumedEnergy();
-        data[i][7] = animal.getUID();
+        dataAnimal[i][3] = animal.getSpeed();
+        dataAnimal[i][4] = animal.getEnergyAmount();
+        dataAnimal[i][5] = animal.getDistance();
+        dataAnimal[i][6] = animal.getConsumedEnergy();
+        dataAnimal[i][7] = animal.getUID();
     }
 
     /**
@@ -374,5 +416,115 @@ public class CompetitionFrame extends JFrame {
                 animal.drawObject(g);
             }
         }
+    }
+
+    private void openTournamentInfo(Object[][] data) {
+        if (!infoTournamentTableStatus) {
+            infoTournamentTableStatus = true;
+            // Column headers for the table
+            String[] columns = {
+                    //    NAME       TYPE    CLS NAME
+                    "Area", "Tournament", "Animal name", "Date"
+            };
+            // Create the table with the data and column headers
+            JTable table = new JTable(data, columns);
+
+            // Create Scroll
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+            // Center value
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            table.setDefaultRenderer(Object.class, centerRenderer);
+
+            // Create a new frame to display the table
+            JFrame tableFrame = new JFrame("Tournament Info");
+            tableFrame.setLayout(new BorderLayout());
+            tableFrame.add(scrollPane);
+            tableFrame.setSize(1400, 600);
+            tableFrame.setLocationRelativeTo(null);
+            tableFrame.setResizable(false);
+            tableFrame.setVisible(true);
+
+            tableFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            tableFrame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    infoTournamentTableStatus = false;
+                }
+            });
+        }
+    }
+
+    public void createTournamentInfoArrayFirstTime() {
+        for (int i = 0, j = 0; i < allTournaments.size(); ++i) {
+            Tournament tournament = allTournaments.get(i);
+            switch (tournament) {
+                case RegularTournament regularTournament -> {
+                    ArrayList<Scores> scores = regularTournament.getThread().returnScores();
+                    for (Scores score : scores) {
+                        synchronized (score.getAll()) {
+                            for (Map.Entry<String, Date> entry : score.getAll().entrySet()) {
+                                dataTournament[j][0] = regularTournament.returnCompetitionArea();
+                                dataTournament[j][1] = regularTournament.returnTournamentType();
+                                dataTournament[j][2] = entry.getKey();
+                                dataTournament[j][3] = entry.getValue();
+                                ++j;
+                            }
+                        }
+                    }
+                }
+                case CourierTournament courierTournament -> {
+                    ArrayList<Scores> scores = courierTournament.getThread().returnScores();
+                    for (Scores score : scores) {
+                        synchronized (score.getAll()) {
+                            for (Map.Entry<String, Date> entry : score.getAll().entrySet()) {
+                                dataTournament[j][0] = courierTournament.returnCompetitionArea();
+                                dataTournament[j][1] = courierTournament.returnTournamentType();
+                                dataTournament[j][2] = entry.getKey();
+                                dataTournament[j][3] = entry.getValue();
+                                ++j;
+                            }
+                        }
+                    }
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + tournament);
+            }
+
+        }
+    }
+
+    public int getJTableTournamentInfoSize() {
+        int count = 0;
+
+        for (Tournament tournament : allTournaments) {
+            switch (tournament) {
+                case RegularTournament regularTournament -> {
+                    ArrayList<Scores> scores = regularTournament.getThread().returnScores();
+                    for (Scores score : scores) {
+                        synchronized (score.getAll()) {
+                            for (Map.Entry<String, Date> entry : score.getAll().entrySet()) {
+                                ++count;
+                            }
+                        }
+                    }
+                }
+                case CourierTournament courierTournament -> {
+                    ArrayList<Scores> scores = courierTournament.getThread().returnScores();
+                    for (Scores score : scores) {
+                        synchronized (score.getAll()) {
+                            for (Map.Entry<String, Date> entry : score.getAll().entrySet()) {
+                                ++count;
+                            }
+                        }
+                    }
+
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + tournament);
+            }
+        }
+        return count;
     }
 }
